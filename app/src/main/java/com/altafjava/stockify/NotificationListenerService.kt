@@ -3,19 +3,34 @@ package com.altafjava.stockify
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.lifecycle.MutableLiveData
+import androidx.room.Room
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
 class NotificationListener : NotificationListenerService() {
-
-    data class NotificationData(
-        val packageName: String,
-        val title: String,
-        val text: String,
-        val timestamp: String
-    )
+    private lateinit var notificationDao: NotificationDao
+    override fun onCreate() {
+//        super.onCreate()
+//        val db = Room.databaseBuilder(
+//            applicationContext, NotificationDatabase::class.java, "notification-database"
+//        )
+//            .allowMainThreadQueries()
+//            .build()
+//        notificationDao = db.notificationDao()
+        super.onCreate()
+        val db = Room.databaseBuilder(
+            applicationContext,
+            NotificationDatabase::class.java, "notification-database"
+        ).build()
+        CoroutineScope(Dispatchers.IO).launch {
+            notificationDao = db.notificationDao()
+        }
+    }
 
     companion object {
         val notificationData = MutableLiveData<List<NotificationData>>(emptyList())
@@ -29,9 +44,13 @@ class NotificationListener : NotificationListenerService() {
         val text = extras.getCharSequence("android.text")?.toString()
         val timestamp = getCurrentTimeInIST()
         if (title != null && text != null) {
-            val newData = notificationData.value?.toMutableList() ?: mutableListOf()
-            newData.add(0, NotificationData(packageName, title, text, timestamp))
-            notificationData.postValue(newData)
+            val notificationData = NotificationData(
+                packageName = packageName, title = title, text = text, timestamp = timestamp
+            )
+//            notificationDao.insert(notificationData)
+            CoroutineScope(Dispatchers.IO).launch {
+                notificationDao.insert(notificationData)
+            }
         }
     }
 

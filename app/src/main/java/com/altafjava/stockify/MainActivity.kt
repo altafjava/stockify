@@ -15,27 +15,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.room.Room
 import com.altafjava.stockify.ui.theme.StockifyTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
-
+    private lateinit var notificationDao: NotificationDao
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkNotificationAccessPermission()
-        setContent {
-            StockifyTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val notificationData =
-                        remember { mutableStateListOf<NotificationListener.NotificationData>() }
-                    NotificationListener.notificationData.observe(this) { data ->
-                        notificationData.clear()
-                        notificationData.addAll(data)
+        val db = Room.databaseBuilder(
+            applicationContext,
+            NotificationDatabase::class.java, "notification-database"
+        ).build()
+        notificationDao = db.notificationDao()
+        lateinit var notifications: List<NotificationData>
+        CoroutineScope(Dispatchers.IO).launch {
+            notifications = notificationDao.getAll()
+            withContext(Dispatchers.Main) {
+                setContent {
+                    StockifyTheme {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            val notificationData = remember { mutableStateListOf<NotificationData>() }
+                            notificationData.addAll(notifications)
+                            NotificationList(notificationData)
+                        }
                     }
-                    NotificationList(notificationData)
                 }
             }
         }
@@ -53,7 +64,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NotificationList(data: List<NotificationListener.NotificationData>) {
+fun NotificationList(data: List<NotificationData>) {
     if (data.isEmpty()) {
         Text(text = "Currently there are no notifications.")
     } else {
