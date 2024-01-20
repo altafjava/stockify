@@ -2,7 +2,6 @@ package com.altafjava.stockify
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,13 +14,6 @@ import java.util.TimeZone
 class NotificationListener : NotificationListenerService() {
     private lateinit var notificationDao: NotificationDao
     override fun onCreate() {
-//        super.onCreate()
-//        val db = Room.databaseBuilder(
-//            applicationContext, NotificationDatabase::class.java, "notification-database"
-//        )
-//            .allowMainThreadQueries()
-//            .build()
-//        notificationDao = db.notificationDao()
         super.onCreate()
         val db = Room.databaseBuilder(
             applicationContext,
@@ -31,11 +23,6 @@ class NotificationListener : NotificationListenerService() {
             notificationDao = db.notificationDao()
         }
     }
-
-    companion object {
-        val notificationData = MutableLiveData<List<NotificationData>>(emptyList())
-    }
-
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         super.onNotificationPosted(sbn)
         val packageName = sbn.packageName
@@ -47,7 +34,6 @@ class NotificationListener : NotificationListenerService() {
             val notificationData = NotificationData(
                 packageName = packageName, title = title, text = text, timestamp = timestamp
             )
-//            notificationDao.insert(notificationData)
             CoroutineScope(Dispatchers.IO).launch {
                 notificationDao.insert(notificationData)
             }
