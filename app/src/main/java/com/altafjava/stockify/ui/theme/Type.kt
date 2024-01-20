@@ -1,4 +1,4 @@
-package com.altafjava.lula.ui.theme
+package com.altafjava.stockify.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

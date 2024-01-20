@@ -1,4 +1,4 @@
-package com.altafjava.lula
+package com.altafjava.stockify
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.altafjava.lula.ui.theme.LulaTheme
+import com.altafjava.stockify.ui.theme.StockifyTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         checkNotificationAccessPermission()
         setContent {
-            LulaTheme {
+            StockifyTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

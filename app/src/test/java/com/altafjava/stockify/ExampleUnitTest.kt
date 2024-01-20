@@ -1,4 +1,4 @@
-package com.altafjava.lula
+package com.altafjava.stockify
 
 import org.junit.Test
 

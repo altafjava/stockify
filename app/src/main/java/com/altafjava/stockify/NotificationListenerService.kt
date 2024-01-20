@@ -1,4 +1,4 @@
-package com.altafjava.lula
+package com.altafjava.stockify
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
