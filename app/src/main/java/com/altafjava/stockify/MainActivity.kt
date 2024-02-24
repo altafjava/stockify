@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Observer
 import androidx.room.Room
 import com.altafjava.stockify.ui.theme.StockifyTheme
 import kotlinx.coroutines.CoroutineScope
@@ -32,24 +33,18 @@ class MainActivity : ComponentActivity() {
             NotificationDatabase::class.java, "notification-database"
         ).build()
         notificationDao = db.notificationDao()
-        lateinit var notifications: List<NotificationData>
-        CoroutineScope(Dispatchers.IO).launch {
-            notifications = notificationDao.getAll()
-            withContext(Dispatchers.Main) {
-                setContent {
-                    StockifyTheme {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = MaterialTheme.colorScheme.background
-                        ) {
-                            val notificationData = remember { mutableStateListOf<NotificationData>() }
-                            notificationData.addAll(notifications)
-                            NotificationList(notificationData)
-                        }
+        notificationDao.getAll().observe(this, Observer { notifications ->
+            setContent {
+                StockifyTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        NotificationList(notifications)
                     }
                 }
             }
-        }
+        })
     }
 
     private fun checkNotificationAccessPermission() {
