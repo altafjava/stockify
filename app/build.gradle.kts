@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.altafjava.stockify"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -46,7 +46,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,LGPL2.1,DEPENDENCIES}"
         }
     }
 }
@@ -68,6 +68,15 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.android.gms:play-services-drive:17.0.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.17.0")
+    implementation("com.google.apis:google-api-services-sheets:v4-rev505-1.23.0") {
+        exclude(group = "com.google.guava")
+    }
+    implementation("com.google.api-client:google-api-client-android:1.31.5") {
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
 
     testImplementation("androidx.room:room-testing:$roomVersion")
     testImplementation("junit:junit:4.13.2")
